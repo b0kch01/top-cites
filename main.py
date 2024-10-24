@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup, Tag
 from dataclasses import dataclass
 import requests
-import curlify
 import requests_cache
 import urllib
 from termcolor import colored
@@ -29,7 +28,7 @@ class Article:
 
 class RequestsManager:
     def __init__(self):
-        self.session = requests_cache.CachedSession("request_cache")
+        self.session = requests.session()
         self.headers = {
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
         }
@@ -77,9 +76,8 @@ def grab_articles_from_page(page, sort_by_citations=False):
             articles.append(article)
 
     if len(articles) == 0:
-        with open("test.html", "w") as f:
-            f.write(page.prettify())
-        exit(0)
+        print("no results! (did you get detected?)")
+        return []
 
     if sort_by_citations:
         return sorted(articles, key=lambda x: x.citations, reverse=True)
