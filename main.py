@@ -5,6 +5,7 @@ import requests_cache
 import urllib
 from termcolor import colored
 from time import sleep
+import csv
 
 from cookies import get_cookies
 
@@ -112,6 +113,21 @@ def grab_citations(rm, link, page=0):
     return results
 
 
+def export(citations):
+    citations.sort(key=lambda x: x.citations, reverse=True)
+
+    print("Exporting citations...", end="")
+
+    with open("top-citations.csv", "w") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Title", "Author", "Cited by", "Citations"])
+        for citation in citations:
+            writer.writerow([citation.title, citation.author,
+                            citation.cited_by, citation.citations])
+
+    print(colored("Done!", "green"))
+
+
 def print_menu():
     print("""
  ▗▄▄▖▗▄▄▄▖▗▄▄▄▖▗▄▄▄▖
@@ -174,10 +190,17 @@ def main():
 
         if page >= chosen_article.citations // 10:
             print("\nNo more pages to view.")
+
+            if input("Export results? [y/n]") == "y":
+                export(all_citations)
+
             break
 
         cont = input(
-            colored("Press enter to get next page or 'q' to quit> ", "blue"))
+            colored("[Enter] For next page; [q] to quit; [e] to export> ", "blue"))
+        if cont == "e":
+            export(all_citations)
+            break
         if cont == "q":
             break
 
