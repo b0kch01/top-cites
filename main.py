@@ -65,7 +65,7 @@ def parse_article_from_div(div: Tag):
         return Article(title, author, -1, None)
 
 
-def grab_articles_from_page(page, sort_by_citations=False):
+def grab_articles_from_page(page):
     articles = []
 
     results = page.select(".gs_r.gs_or.gs_scl")
@@ -80,10 +80,7 @@ def grab_articles_from_page(page, sort_by_citations=False):
         print("no results! (did you get detected?)")
         return []
 
-    if sort_by_citations:
-        return sorted(articles, key=lambda x: x.citations, reverse=True)
-    else:
-        return articles
+    return articles
 
 
 def search_articles(rm: RequestsManager, query):
@@ -113,20 +110,22 @@ def grab_citations(rm, link, page=0):
         raise Exception(f"Failed to fetch citations for {link}")
 
     citations_page = BeautifulSoup(str(res.content), features="lxml")
-    results = grab_articles_from_page(citations_page, sort_by_citations=False)
+    results = grab_articles_from_page(citations_page)
 
     return results
 
 
 def export(citations):
     citations.sort(key=lambda x: x.citations, reverse=True)
+    count = input("How many to export? (0 for all) > ")
+    count = len(citations) if count == 0 else int(count)
 
     print("Exporting citations...", end="")
 
     with open("top-citations.csv", "w") as f:
         writer = csv.writer(f)
         writer.writerow(["Title", "Author", "Cited by", "Citations"])
-        for citation in citations:
+        for citation in citations[:count]:
             writer.writerow([citation.title, citation.author,
                             citation.cited_by, citation.citations])
 
@@ -189,7 +188,7 @@ def main():
     for page in range(50):
         citations = grab_citations(rm, chosen_article.cited_by, page=page)
         all_citations += citations
-        all_citations.sort(key=lambda x: x.citations, reverse=False)
+        all_citations.sort(key=lambda x: x.citations, reverse=True)
 
         print()
         print(f"Viewing {page+1} page(s) of citations (sorted):")
