@@ -5,7 +5,7 @@
 ```
 
 > [!Warning]
-> You can be rate limited. Use responsibly.
+> You can be rate limited. Use responsibly :).
 
 ## Usage
 1. Install requirements: `pip install -r requirements.txt`
