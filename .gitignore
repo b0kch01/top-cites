@@ -1,2 +1,3 @@
 request_cache.sqlite
 *.ipynb
+__pycache__

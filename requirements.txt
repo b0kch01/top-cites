@@ -2,3 +2,4 @@ beautifulsoup4
 Requests
 requests_cache
 termcolor
+playwright
