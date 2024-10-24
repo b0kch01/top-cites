@@ -101,7 +101,12 @@ def search_articles(rm: RequestsManager, query):
 
 
 def grab_citations(rm, link, page=0):
-    url = "https://scholar.google.com" + link + "&start=" + str(page * 10)
+    if link.startswith("https://scholar.google.com/scholar?cites"):
+        if "&start=" in link:
+            url = link.replace("&start=", "")
+        url = link
+    else:
+        url = "https://scholar.google.com" + link + "&start=" + str(page * 10)
 
     res = rm.get(url)
     if res.status_code != 200:
@@ -155,25 +160,28 @@ def main():
         elif len(query) > 0:
             break
 
-    results = search_articles(rm, query)
+    if query.startswith("https://scholar.google.com/scholar?cites"):
+        chosen_article = Article("Custom", "Custom", -1, query)
+    else:
+        results = search_articles(rm, query)
 
-    print()
+        print()
 
-    for i, article in enumerate(results):
-        article.display(i)
+        for i, article in enumerate(results):
+            article.display(i)
 
-    print()
+        print()
 
-    choice = int(input(
-        colored("Choose an article to view its citations> ", "blue")))
+        choice = int(input(
+            colored("Choose an article to view its citations> ", "blue")))
 
-    chosen_article = results[choice]
+        chosen_article = results[choice]
 
-    print(f"[Selected] \"{chosen_article.title}\"")
-    print()
-    print(f"-- Author: {chosen_article.author}")
-    print(f"-- Cited by: {chosen_article.cited_by}")
-    print(f"-- Citations: {chosen_article.citations}")
+        print(f"[Selected] \"{chosen_article.title}\"")
+        print()
+        print(f"-- Author: {chosen_article.author}")
+        print(f"-- Cited by: {chosen_article.cited_by}")
+        print(f"-- Citations: {chosen_article.citations}")
 
     all_citations = []
 
