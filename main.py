@@ -23,8 +23,7 @@ class Article:
         if self.citations == -1:
             print(f"    {colored('No citations reported', 'red')}")
         else:
-            print(
-                f"    {colored(str(self.citations) + ' citations', 'yellow')}")
+            print(f"    {colored(str(self.citations) + ' citations', 'yellow')}")
 
 
 class RequestsManager:
@@ -37,7 +36,7 @@ class RequestsManager:
         self.solve_captcha()
 
     def solve_captcha(self):
-        self.cookie = {"GSP":  get_cookies()}
+        self.cookie = {"GSP": get_cookies()}
 
     def get(self, url):
         res = self.session.get(url, cookies=self.cookie, headers=self.headers)
@@ -51,8 +50,7 @@ def parse_article_from_div(div: Tag):
     title = div.select_one("h3>*:last-child").text
     author = div.select_one(".gs_a").text.replace("\\xa0", " ")
 
-    cites_tags = list(
-        filter(lambda r: "Cited by" in r.text, div.select("a")))
+    cites_tags = list(filter(lambda r: "Cited by" in r.text, div.select("a")))
 
     if len(cites_tags) > 0:
         cites_tag = cites_tags[0]
@@ -117,8 +115,8 @@ def grab_citations(rm, link, page=0):
 
 def export(citations):
     citations.sort(key=lambda x: x.citations, reverse=True)
-    count = input("How many to export? (0 for all) > ")
-    count = len(citations) if count == 0 else int(count)
+    count = int(input("How many to export? (0 for all) > "))
+    count = len(citations) if count == 0 else count
 
     print("Exporting citations...", end="")
 
@@ -126,8 +124,9 @@ def export(citations):
         writer = csv.writer(f)
         writer.writerow(["Title", "Author", "Cited by", "Citations"])
         for citation in citations[:count]:
-            writer.writerow([citation.title, citation.author,
-                            citation.cited_by, citation.citations])
+            writer.writerow(
+                [citation.title, citation.author, citation.cited_by, citation.citations]
+            )
 
     print(colored("Done!", "green"))
 
@@ -140,7 +139,7 @@ def print_menu():
 ▝▚▄▄▖▗▄█▄▖  █  ▐▙▄▄▖
         """)
 
-    red_clear = colored('\"clear\"', 'red')
+    red_clear = colored('"clear"', "red")
     print(f"{red_clear} to clear request cache. Watch out for rate limits!\n")
 
 
@@ -171,12 +170,13 @@ def main():
 
         print()
 
-        choice = int(input(
-            colored("Choose an article to view its citations> ", "blue")))
+        choice = int(
+            input(colored("Choose an article to view its citations> ", "blue"))
+        )
 
         chosen_article = results[choice]
 
-        print(f"[Selected] \"{chosen_article.title}\"")
+        print(f'[Selected] "{chosen_article.title}"')
         print()
         print(f"-- Author: {chosen_article.author}")
         print(f"-- Cited by: {chosen_article.cited_by}")
@@ -204,7 +204,8 @@ def main():
             break
 
         cont = input(
-            colored("[Enter] For next page; [q] to quit; [e] to export> ", "blue"))
+            colored("[Enter] For next page; [q] to quit; [e] to export> ", "blue")
+        )
         if cont == "e":
             export(all_citations)
             break
